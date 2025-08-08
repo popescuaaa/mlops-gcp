@@ -9,3 +9,13 @@ todos:
 ## Cloud setup
 
 1. Create uv environment
+
+
+## Course structure
+
+- [ ] CI/CD
+- [ ] Composer/Airflow
+- [ ] Vertex
+- [ ] KFP
+- [ ] Hyperparams, versioning etc
+- [ ] GenAI on Vertex
