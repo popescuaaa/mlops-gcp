@@ -1,8 +1,12 @@
 # MLOPs Courss (GCP) using Vertex
 
 todos:
-- [ ] make env
-- [ ] make infra with bash or tf
+- [x] make env
+- [x] make infra with bash or tf - ci/cd is set up
+  - [ ] create the cloud run job for data creation & test it
+  - [ ] add test step for the generator
+  - [ ] create a simple deployment for a ML model with predict endpoint ~ simple sklearn pipeline
+  - [ ] deploy all cloud run jobs and services
 - [ ] document
 - [ ] course sections
 
