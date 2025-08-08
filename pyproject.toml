@@ -1,0 +1,14 @@
+[project]
+name = "mlops-playground"
+version = "0.1.0"
+description = "Machine Learning Ops on GCP using vertex"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "google-cloud-aiplatform>=1.93.0",
+    "kfp>=2.13.0",
+    "pandas",
+    "matplotlib",
+    "jupyter",
+    "black",
+]
