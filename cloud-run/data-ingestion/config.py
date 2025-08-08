@@ -3,4 +3,4 @@ class AppConfig:
     TABLE_ID = "users"
     DATASET = "fashion_store"
     BUCKET = "fashion_store"
-    ENV = "local"
+    ENV = "gcp"

@@ -5,12 +5,12 @@ import google.auth
 from google.cloud import bigquery
 from google.cloud import storage
 
+
 class App:
     def __init__(self, name: str, config: AppConfig):
         self.name = name
         self.generator = FakeUserDataGenerator()
         self.config = config
-
 
         # Retrieve project id from the underlying service account
         if self.config.ENV != "local":
@@ -18,21 +18,26 @@ class App:
             self.storage_client = storage.Client()
             self.credentials, self.project_id = google.auth.default()
 
-    def run(self,):
+    def run(
+        self,
+    ):
         # Generate a batch of user data samples
         print("Generarting a batch of user data samples")
         num_samples = self.config.SAMPLES
         samples = self.generator.generate_data(num_entries=num_samples)
-        samples_df = pd.DataFrame([
-            {
-                "user_id": entry.user_id,
-                "name": entry.name,
-                "email": entry.email,
-                "location": entry.location,
-                "purchase_value": entry.purchase_value,
-                "purchase_date": entry.purchase_date
-            } for entry in samples
-        ])
+        samples_df = pd.DataFrame(
+            [
+                {
+                    "user_id": entry.user_id,
+                    "name": entry.name,
+                    "email": entry.email,
+                    "location": entry.location,
+                    "purchase_value": entry.purchase_value,
+                    "purchase_date": entry.purchase_date,
+                }
+                for entry in samples
+            ]
+        )
 
         # Save data to Docker storage
         samples_df.to_csv("user_samples.csv")
@@ -75,13 +80,9 @@ class App:
         print("Loaded {} rows.".format(destination_table.num_rows))
 
 
-
 if __name__ == "__main__":
     app_config = AppConfig()
-    app = App(
-        name="ingestion_app",
-        config=app_config
-    )
+    app = App(name="ingestion_app", config=app_config)
 
     if app_config.ENV == "local":
         app.run()

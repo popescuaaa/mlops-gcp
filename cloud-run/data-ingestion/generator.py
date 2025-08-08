@@ -17,12 +17,46 @@ class UserPurchase:
 
 class FakeUserDataGenerator:
     def __init__(self):
-        self.first_names = ["Emma", "Liam", "Olivia", "Noah", "Sophia", "Jackson", "Ava", "Aiden",
-                           "Isabella", "Lucas", "Mia", "Caden", "Amelia", "Grayson", "Charlotte"]
+        self.first_names = [
+            "Emma",
+            "Liam",
+            "Olivia",
+            "Noah",
+            "Sophia",
+            "Jackson",
+            "Ava",
+            "Aiden",
+            "Isabella",
+            "Lucas",
+            "Mia",
+            "Caden",
+            "Amelia",
+            "Grayson",
+            "Charlotte",
+        ]
 
-        self.last_names = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller",
-                          "Davis", "Rodriguez", "Martinez", "Hernandez", "Lopez", "Gonzalez",
-                          "Wilson", "Anderson", "Thomas", "Taylor", "Moore", "Jackson", "Martin"]
+        self.last_names = [
+            "Smith",
+            "Johnson",
+            "Williams",
+            "Brown",
+            "Jones",
+            "Garcia",
+            "Miller",
+            "Davis",
+            "Rodriguez",
+            "Martinez",
+            "Hernandez",
+            "Lopez",
+            "Gonzalez",
+            "Wilson",
+            "Anderson",
+            "Thomas",
+            "Taylor",
+            "Moore",
+            "Jackson",
+            "Martin",
+        ]
 
         self.european_cities = {
             "France": ["Paris", "Lyon", "Marseille", "Bordeaux", "Lille"],
@@ -30,11 +64,23 @@ class FakeUserDataGenerator:
             "Italy": ["Rome", "Milan", "Naples", "Turin", "Florence"],
             "Spain": ["Madrid", "Barcelona", "Valencia", "Seville", "Bilbao"],
             "UK": ["London", "Manchester", "Birmingham", "Glasgow", "Liverpool"],
-            "Netherlands": ["Amsterdam", "Rotterdam", "Utrecht", "The Hague", "Eindhoven"],
-            "Poland": ["Warsaw", "Krakow", "Lodz", "Wroclaw", "Poznan"]
+            "Netherlands": [
+                "Amsterdam",
+                "Rotterdam",
+                "Utrecht",
+                "The Hague",
+                "Eindhoven",
+            ],
+            "Poland": ["Warsaw", "Krakow", "Lodz", "Wroclaw", "Poznan"],
         }
 
-        self.domains = ["gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "protonmail.com"]
+        self.domains = [
+            "gmail.com",
+            "yahoo.com",
+            "hotmail.com",
+            "outlook.com",
+            "protonmail.com",
+        ]
         self.users = {}  # user_id -> (name, email)
 
     def _generate_user(self) -> Dict[str, Any]:
@@ -58,7 +104,7 @@ class FakeUserDataGenerator:
             "user_id": user_id,
             "name": full_name,
             "email": email,
-            "location": location
+            "location": location,
         }
 
     def _generate_purchase(self, user_id: str, name: str, email: str) -> UserPurchase:
@@ -78,7 +124,7 @@ class FakeUserDataGenerator:
             email=email,
             location=location,
             purchase_value=purchase_value,
-            purchase_date=purchase_date
+            purchase_date=purchase_date,
         )
 
     def generate_data(self, num_entries: int = 10000) -> List[UserPurchase]:
@@ -86,15 +132,17 @@ class FakeUserDataGenerator:
         result = []
 
         # Decide how many unique users we want (between 20-50% of total entries)
-        num_unique_users = random.randint(int(num_entries * 0.2), int(num_entries * 0.5))
+        num_unique_users = random.randint(
+            int(num_entries * 0.2), int(num_entries * 0.5)
+        )
 
         # Generate unique users
         for _ in range(num_unique_users):
             user = self._generate_user()
             # Each user makes at least one purchase
-            result.append(self._generate_purchase(
-                user["user_id"], user["name"], user["email"]
-            ))
+            result.append(
+                self._generate_purchase(user["user_id"], user["name"], user["email"])
+            )
 
         # Generate remaining purchases from existing users
         remaining_entries = num_entries - num_unique_users
