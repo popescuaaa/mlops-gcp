@@ -1,5 +1,5 @@
-from .generator import FakeUserDataGenerator
-from .config import AppConfig
+from generator import FakeUserDataGenerator
+from config import AppConfig
 import pandas as pd
 import google.auth
 from google.cloud import bigquery
@@ -10,11 +10,13 @@ class App:
         self.name = name
         self.generator = FakeUserDataGenerator()
         self.config = config
-        self.bq_client = bigquery.Client()
-        self.storage_client = storage.Client()
+
 
         # Retrieve project id from the underlying service account
-        self.credentials, self.project_id = google.auth.default()
+        if self.config.ENV != "local":
+            self.bq_client = bigquery.Client()
+            self.storage_client = storage.Client()
+            self.credentials, self.project_id = google.auth.default()
 
     def run(self,):
         # Generate a batch of user data samples
@@ -34,7 +36,9 @@ class App:
 
         # Save data to Docker storage
         samples_df.to_csv("user_samples.csv")
+        print(f"Data was generated succesfully: shape {samples_df.shape}")
 
+    def ingest(self):
         # Upload data to gcs
         bucket_name = self.config.BUCKET
         bucket = self.storage_client.bucket(bucket_name=bucket_name)
@@ -69,3 +73,18 @@ class App:
 
         destination_table = self.bq_client.get_table(table_id)  # Make an API request.
         print("Loaded {} rows.".format(destination_table.num_rows))
+
+
+
+if __name__ == "__main__":
+    app_config = AppConfig()
+    app = App(
+        name="ingestion_app",
+        config=app_config
+    )
+
+    if app_config.ENV == "local":
+        app.run()
+    else:
+        app.run()
+        app.ingest()
