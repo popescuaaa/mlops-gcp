@@ -11,7 +11,7 @@ jobs:
       contents: "read"
       id-token: "write"
     outputs:
-      image_name: ${{ steps.build.outputs.image_name }}
+      image_name: ${{ steps.set_output.outputs.image_name }}
 
     steps:
       - uses: actions/checkout@v3
@@ -30,7 +30,7 @@ jobs:
         name: Build and push with Kaniko
         uses: docker/build-push-action@v4
         with:
-          context: .
+          context: ./cloud-run/data-ingestion
           file: ./cloud-run/data-ingestion/Dockerfile
           push: true
           tags: |
@@ -41,9 +41,10 @@ jobs:
 
       - name: Set image name output
         id: set_output
-        run: echo "image_name=us-central1-docker.pkg.dev/${{ steps.auth.outputs.project_id }}/ingestion/latest:${{ github.sha }}" >> $GITHUB_OUTPUT
+        run: echo "image_name=europe-west1-docker.pkg.dev/${{ steps.auth.outputs.project_id }}/ingestion/latest:${{ github.sha }}" >> $GITHUB_OUTPUT
 
   deploy:
+    needs: build
     runs-on: ubuntu-latest
     permissions:
       contents: "read"
@@ -66,7 +67,9 @@ jobs:
         run: "gcloud info"
 
       - name: Make deploy script executable
-        run: chmod +x ./infrastructure/deploy-ingestion.sh
+        working-directory: ./infrastructure
+        run: chmod +x ./deploy-ingestion.sh
 
       - name: Run deploy script with image name
-        run: ./deploy.sh ${{ needs.build.outputs.image_name }} ${{ secrets.SERVICE_ACCOUNT }}
+        working-directory: ./infrastructure
+        run: ./deploy-ingestion.sh ${{ needs.build.outputs.image_name }} ${{ secrets.SERVICE_ACCOUNT }}
