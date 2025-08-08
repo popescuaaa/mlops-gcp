@@ -27,4 +27,6 @@ jobs:
       - name: "Use gcloud CLI"
         run: "gcloud info"
 
-    # Add your deployment steps here
+      # Basic deployment steps
+      - name: "Create Artifact Registries"
+        run: "gcloud auth list"
