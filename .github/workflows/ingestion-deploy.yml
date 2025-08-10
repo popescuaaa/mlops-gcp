@@ -1,9 +1,7 @@
 name: Ingestion Deployment
-
 on:
   push:
     branches: [main]
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -12,10 +10,8 @@ jobs:
       id-token: "write"
     outputs:
       image_name: ${{ steps.set_output.outputs.image_name }}
-
     steps:
       - uses: actions/checkout@v3
-
       - id: "auth"
         name: "Authenticate to GCP"
         uses: "google-github-actions/auth@v1"
@@ -23,14 +19,11 @@ jobs:
           workload_identity_provider: "${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}"
           service_account: "${{ secrets.SERVICE_ACCOUNT }}"
           token_format: "access_token"
-
       - name: "Set up Cloud SDK"
         uses: "google-github-actions/setup-gcloud@v1"
-
       - name: "Configure Docker for Artifact Registry"
         run: |
           gcloud auth configure-docker europe-west1-docker.pkg.dev --quiet
-
       - id: build
         name: Build and push with Kaniko
         uses: docker/build-push-action@v4
@@ -43,38 +36,31 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64
-
       - name: Set image name output
         id: set_output
         run: echo "image_name=europe-west1-docker.pkg.dev/${{ steps.auth.outputs.project_id }}/ingestion/latest:${{ github.sha }}" >> $GITHUB_OUTPUT
-
   deploy:
     needs: build
     runs-on: ubuntu-latest
     permissions:
       contents: "read"
       id-token: "write"
-
     steps:
       - uses: actions/checkout@v3
-
       - id: "auth"
         name: "Authenticate to GCP"
         uses: "google-github-actions/auth@v1"
         with:
           workload_identity_provider: "${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}"
           service_account: "${{ secrets.SERVICE_ACCOUNT }}"
-
+          token_format: "access_token" # Add this line to match the build job
       - name: "Set up Cloud SDK"
         uses: "google-github-actions/setup-gcloud@v1"
-
       - name: "Use gcloud CLI [test]"
         run: "gcloud info"
-
       - name: Make deploy script executable
         working-directory: ./infrastructure
-        run: chmod +x ./deploy-ingestion.sh
-
+        run: chmod a+x ./deploy-ingestion.sh
       - name: Run deploy script with image name
         working-directory: ./infrastructure
         run: ./deploy-ingestion.sh ${{ needs.build.outputs.image_name }} ${{ secrets.SERVICE_ACCOUNT }}
