@@ -18,11 +18,14 @@ jobs:
         with:
           workload_identity_provider: "${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}"
           service_account: "${{ secrets.SERVICE_ACCOUNT }}"
+
       - name: "Set up Cloud SDK"
         uses: "google-github-actions/setup-gcloud@v1"
+
       - name: "Configure Docker for Artifact Registry"
         run: |
           gcloud auth configure-docker europe-west1-docker.pkg.dev --quiet
+
       - id: build
         name: Build and push with Kaniko
         uses: docker/build-push-action@v4
@@ -32,12 +35,12 @@ jobs:
           push: true
           tags: |
             europe-west1-docker.pkg.dev/${{ steps.auth.outputs.project_id }}/ingestion/latest:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
           platforms: linux/amd64
+
       - name: Set image name output
         id: set_output
         run: echo "image_name=europe-west1-docker.pkg.dev/${{ steps.auth.outputs.project_id }}/ingestion/latest:${{ github.sha }}" >> $GITHUB_OUTPUT
+
   deploy:
     needs: build
     runs-on: ubuntu-latest
